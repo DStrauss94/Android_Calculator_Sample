@@ -26,6 +26,11 @@ class MainActivity : AppCompatActivity() {
         result = findViewById(R.id.result)
         newNumber = findViewById(R.id.newNumber)
 
+        //*************************************************************************
+
+        //TWO DIFFERENT WAYS TO ASSIGN BUTTON VALUES
+
+
         //Data input buttons
         val button0 : Button = findViewById(R.id.button0)
         val button1 : Button = findViewById(R.id.button1)
@@ -41,15 +46,17 @@ class MainActivity : AppCompatActivity() {
 
         //Operation Buttons
         val buttonEquals = findViewById<Button>(R.id.buttonEquals)
-        val buttondivide = findViewById<Button>(R.id.buttonDivide)
+        val buttonDivide = findViewById<Button>(R.id.buttonDivide)
         val buttonMultiply = findViewById<Button>(R.id.buttonMultiply)
         val buttonMinus= findViewById<Button>(R.id.buttonMinus)
         val buttonPlus = findViewById<Button>(R.id.buttonPlus)
 
+        //***************************************************************************
+
         //listener holds a reference to a new onClickListener instance
         //https://developer.android.com/reference/android/view/View.OnClickListener
         val listener = View.OnClickListener { v ->
-            val b = v as Button
+            val b = v as Button // since we are going to set these to buttons, v has to be casted as a button widget
             newNumber.append(b.text)
         }
 
@@ -65,8 +72,52 @@ class MainActivity : AppCompatActivity() {
         button9.setOnClickListener(listener)
         buttonDot.setOnClickListener(listener)
 
+        val opListener = View.OnClickListener { v ->
+            val op = (v as Button).text.toString()
+            val value = newNumber.text.toString()
+            if(value.isNotEmpty()){
+                performOperation(value,op)
+            }
+            pendingOperation = op
+            displayOperation.text = pendingOperation
+        }
+
+        buttonEquals.setOnClickListener(opListener)
+        buttonDivide.setOnClickListener(opListener)
+        buttonMultiply.setOnClickListener(opListener)
+        buttonMinus.setOnClickListener(opListener)
+        buttonPlus.setOnClickListener(opListener)
 
 
 
+
+
+    }
+
+    private fun performOperation(value: String, operation : String){
+        if(operand1 == null){
+            operand1 = value.toDouble()
+        }
+        else{
+            operand2 = value.toDouble()
+        }
+        if(pendingOperation == "="){
+            pendingOperation = operation
+        }
+
+        when(pendingOperation){
+            "=" -> operand1 = operand2
+            "/" -> if(operand2 == 0.0){
+                operand1 = Double.NaN
+            }
+                    else{
+                            operand1 = operand1!! / operand2
+                        }
+            "*" -> operand1 = operand1!! * operand2
+            "-" -> operand1 = operand1!! - operand2
+            "+" -> operand1 = operand1!! + operand2
+        }
+        result.setText(operand1.toString())
+        newNumber.setText("")
     }
 }
